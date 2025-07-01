@@ -1,0 +1,47 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+# Sanal ortam klasörünü yok say
+/venv/
+
+# Python derlenmiş dosyaları ve önbellekleri
+__pycache__/
+*.pyc
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Ortam değişkeni dosyalarını yok say (çok önemli!)
+.env
+.env.production
+.env.env # Eğer varsa farklı ortamlar için .env.dev, .env.test gibi
+
+# Veritabanı dosyaları (PostgreSQL kullanıyorsanız genellikle yerel sqlite3 olmaz ama yine de eklenebilir)
+db.sqlite3
+
+# Log dosyalarını yok say
+*.log
+
+# IDE ve metin editörü özel dosyaları ve klasörleri
+.vscode/ # Visual Studio Code ayarları
+.idea/   # PyCharm/IntelliJ IDEA ayarları
+*.swp    # Vim takas dosyaları
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# İşletim sistemi özel dosyaları
+.DS_Store    # macOS
+Thumbs.db    # Windows
+ehthumbs.db  # Windows
+Desktop.ini  # Windows
+
+# Django ile ilgili üretilen dosyalar (eğer production'da ayrı bir volume kullanmıyorsanız)
+/static_collected/ # `collectstatic` ile toplanan statik dosyalar
+/media/            # Kullanıcıların yüklediği medya dosyaları
+
+# Docker ile ilgili yerel dosyalar (Dockerfile ve docker-compose.yml'ı ignore etmeyin!)
+# Ancak Docker'ın kendisi tarafından oluşturulan geçici dosyalar
+.dockerignore # Kendisi bir gitignore dosyasıdır, ama bazen ignore etmek isteyebilirsiniz. (Genellikle gerekmez)

@@ -1,0 +1,52 @@
+# requirements.txt
+
+# Bu dosya, Python uygulamanızın (Django projenizin) çalışması için gerekli olan
+# tüm harici Python kütüphanelerini (paketleri) listeler.
+# Dockerfile içinde 'pip install -r requirements.txt' komutu bu dosyayı okuyarak
+# belirtilen tüm paketleri konteynerinize yükler.
+
+# asgiref: Django'nun asenkron web sunucusu gateway arayüzü (ASGI) ile uyumluluğunu sağlar.
+# Django'nun asenkron özellikleri için temel bir bağımlılıktır.
+asgiref==3.8.1
+
+# Django: Web çerçevenizin kendisi. Projenizin temelini oluşturur.
+Django==5.2.3
+
+# gunicorn: Bir Python WSGI HTTP Sunucusudur.
+# Üretim ortamında Django uygulamanızı çalıştırmak için kullanılır,
+# çünkü Django'nun kendi geliştirme sunucusu (runserver) üretim için uygun değildir.
+gunicorn==23.0.0
+
+# packaging: Python paketlerinin meta verilerini işlemek için kullanılan bir kütüphanedir.
+# Genellikle diğer paketler tarafından bağımlılık olarak çekilir.
+packaging==25.0
+
+# python-decouple: Ortam değişkenlerini (environment variables) veya '.env' dosyalarını
+# uygulamanızın yapılandırma ayarlarından ayırmanızı sağlayan bir kütüphanedir.
+# Güvenlik ve farklı ortamlar arası geçiş (geliştirme/üretim) için önemlidir.
+python-decouple==3.8
+
+# python-dotenv: '.env' dosyalarından ortam değişkenlerini yüklemek için kullanılan bir kütüphanedir.
+# python-decouple ile benzer işlevi görür veya onunla birlikte kullanılabilir.
+python-dotenv==1.1.1
+
+# sqlparse: SQL kodunu ayrıştırmak, biçimlendirmek ve doğrulamak için bir kütüphanedir.
+# Django'nun veritabanı işlemlerinde dahili olarak kullanılabilir.
+sqlparse==0.5.3
+
+# tzdata: Zaman dilimi verilerini sağlayan bir pakettir.
+# Python'da tarih ve saat işlemlerinde doğru zaman dilimlerini kullanmak için gereklidir.
+tzdata==2025.2
+
+# psycopg2-binary: PostgreSQL veritabanı ile Python arasında bağlantı kurmak için gerekli olan
+# PostgreSQL bağlayıcısıdır. 'binary' versiyonu, derleme gerektirmediği için Docker imajı içinde
+# kurulumu daha kolaydır ve sistem bağımlılıklarına daha az bağımlıdır.
+# Bu paketi daha önceki bağlantı hatalarını çözmek için eklemiştik ve kritik öneme sahiptir.
+psycopg2-binary
+
+
+# whitenoise: Django uygulamanızın statik dosyalarını (CSS, JS, görseller) doğrudan WSGI sunucusu (örneğin Gunicorn) üzerinden sunmasını sağlar.
+# Üretim ortamında Nginx gibi ayrı bir ters proxy sunucu kullanmadan da statik dosyaların hızlı ve etkili şekilde dağıtılmasına olanak tanır.
+# WhiteNoise, performans ve basitlik açısından özellikle küçük ve orta ölçekli uygulamalarda çok kullanışlıdır.
+# Django projesine entegre edilmesi kolaydır ve ekstra bir sunucu yapılandırması gerekmeden cache-control, gzip gibi faydaları sağlar.
+whitenoise==6.6.0

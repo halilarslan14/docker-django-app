@@ -1,0 +1,97 @@
+# production.yml
+
+# Bu dosya, Docker Compose kullanarak Django projenizin ÜRETİM ortamını tanımlar.
+# Üretim ortamı, uygulamanızın canlı kullanıma sunulduğu ortamdır ve güvenlik, performans
+# ve kararlılık öncelikli olmalıdır.
+
+# 'services' anahtarı altında, uygulamanızı oluşturan her bir servisi (konteyneri) tanımlarız.
+services:
+  # 'web' servisi, Django uygulamanızı Gunicorn aracılığıyla çalıştıracak olan konteynerdir.
+  web:
+    # 'build: .' komutu, Docker'a bu servisin imajını mevcut dizindeki (yani 'production.yml' dosyasının bulunduğu
+    # proje kök dizini) Dockerfile'ı kullanarak oluşturmasını söyler.
+    build: .
+
+    # 'command' komutu, 'web' konteyneri başlatıldığında çalıştırılacak olan temel komuttur.
+    # Üretim ortamında Django'nun geliştirme sunucusu (runserver) yerine Gunicorn gibi bir WSGI sunucusu kullanılır.
+    # gunicorn project.wsgi:application: 'project' adlı Django projenizin WSGI uygulamasını çalıştırır.
+    # --bind 0.0.0.0:8000: Gunicorn'un tüm ağ arayüzlerinde (0.0.0.0) 8000 portunu dinlemesini sağlar.
+    # --workers 3: Gunicorn'un 3 adet işçi (worker) süreci başlatmasını söyler. Bu, eşzamanlı istekleri işlemek için önemlidir.
+    # --log-level info: Gunicorn'un bilgi seviyesindeki logları göstermesini sağlar.
+    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level info
+
+    # 'volumes' anahtarı, kalıcı veri depolaması için kullanılır.
+    # Üretim ortamında, statik dosyalarınızın (CSS, JS, resimler) ve medya dosyalarınızın (kullanıcı yüklemeleri)
+    # konteyner yeniden başlatılsa bile kalıcı olmasını sağlamak için volume'ler kullanılır.
+    # - static_volume:/code/backend/staticfiles:
+    #   - 'static_volume': Docker tarafından yönetilen isimlendirilmiş bir volume'dür.
+    #   - '/code/backend/staticfiles': Konteyner içindeki Django'nun 'collectstatic' komutuyla statik dosyaları toplayacağı yoldur.
+    # - media_volume:/code/backend/media:
+    #   - 'media_volume': Docker tarafından yönetilen başka bir isimlendirilmiş volume'dür.
+    #   - '/code/backend/media': Konteyner içindeki Django'nun kullanıcı yüklemelerini depolayacağı yoldur.
+    volumes:
+      #- static_volume:/code/backend/staticfiles
+      - ./backend/staticfiles:/code/backend/staticfiles
+      - media_volume:/code/backend/media
+
+    # 'ports' anahtarı, host makinenizin portlarını konteynerin portlarına eşler.
+    # '- "80:8000"':
+    #   - İlk "80": Host makinenizdeki HTTP (varsayılan) portu. Uygulamanıza doğrudan http://localhost/ adresinden erişmenizi sağlar.
+    #   - İkinci "8000": Konteynerin içindeki Gunicorn sunucusunun dinlediği port.
+    # Canlı ortamda (gerçek sunucuya dağıtım yaparken), genellikle bir Nginx veya Caddy gibi bir ters proxy ile HTTPS (443 portu) kullanılır.
+    ports:
+      - "80:8000"
+
+    # 'env_file' anahtarı, ortam değişkenlerini bir dosyadan yüklemenizi sağlar.
+    #                      Bu dosya, üretim ortamına özel gizli anahtarlar, DEBUG=False gibi ayarları içerir.
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=project.settings.production
+
+    # 'depends_on' anahtarı, servisler arasındaki bağımlılıkları belirtir.
+    # 'web' servisinin 'db' servisine bağımlı olduğunu söyler. Bu, Docker Compose'un 'web' servisini
+    # başlatmadan önce 'db' servisinin başlatıldığından emin olmaya çalışacağı anlamına gelir.
+    # Ancak, bu sadece başlatma sırasını garantiler, veritabanının tam olarak "hazır" olmasını garanti etmez (bazı durumlarda ek bekleme gerekebilir).
+    depends_on:
+      - db
+
+    # 'restart: always': Konteynerin bir hata durumunda veya Docker daemon yeniden başlatıldığında
+    #                   otomatik olarak yeniden başlamasını sağlar. Üretim için çok önemlidir.
+    restart: always
+
+  # 'db' servisi, PostgreSQL veritabanını çalıştıracak olan konteynerdir.
+  db:
+    # 'image: postgres:16': Docker Hub'dan PostgreSQL imajının spesifik '16' sürümünü kullanmasını söyler.
+    # Üretimde 'latest' yerine belirli bir sürümü kullanmak, kararlılık ve tekrarlanabilirlik açısından önemlidir.
+    image: postgres:16 # (Alternatif olarak 'postgres:15-alpine' gibi daha küçük bir imaj da kullanılabilir.)
+
+    # 'volumes' anahtarı, veritabanı verilerini kalıcı hale getirmek için kullanılır.
+    # '- postgres_data:/var/lib/postgresql/data/':
+    #   - 'postgres_data': Docker tarafından yönetilen, verileri kalıcı olarak depolayan isimlendirilmiş bir volume'dür.
+    #   - '/var/lib/postgresql/data/': PostgreSQL'in konteyner içinde verilerini depoladığı standart yoldur.
+    # Bu sayede, 'db' konteyneri silinse veya güncellense bile veritabanı verileriniz kaybolmaz.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+    # 'environment' anahtarı, PostgreSQL konteyneri için ortam değişkenlerini belirler.
+    # Bu değişkenler, PostgreSQL sunucusunun ilk kurulumunda kullanılacak varsayılan veritabanı, kullanıcı ve parola bilgilerini sağlar.
+    # Değerler, yukarıda tanımlanan 'env_file: - .env.production' sayesinde '.env.production' dosyasından alınır.
+    environment:
+      - POSTGRES_DB=${DB_NAME}      # '.env.production' dosyasındaki DB_NAME değişkeninin değeri
+      - POSTGRES_USER=${DB_USER}    # '.env.production' dosyasındaki DB_USER değişkeninin değeri
+      - POSTGRES_PASSWORD=test      #${DB_PASSWORD} # '.env.production' dosyasındaki DB_PASSWORD değişkeninin değeri
+    
+    # 'restart: always': Veritabanı konteynerinin de bir hata durumunda veya Docker daemon yeniden başlatıldığında
+    #                   otomatik olarak yeniden başlamasını sağlar. Üretim için önemlidir.
+    restart: always
+
+# 'volumes' anahtarı (servisler seviyesinin dışında), Docker tarafından yönetilen isimlendirilmiş volume'leri tanımlar.
+# Bu volume'ler, konteynerler silinse bile verileri tutar ve farklı konteynerler arasında paylaşılabilir.
+volumes:
+  # 'postgres_data' isminde bir volume tanımlanır. PostgreSQL verilerini kalıcı olarak depolamak için kullanılır.
+  postgres_data:
+  # 'static_volume' isminde bir volume tanımlanır. Django'nun 'collectstatic' ile topladığı statik dosyaları depolar.
+  static_volume:
+  # 'media_volume' isminde bir volume tanımlanır. Kullanıcıların yüklediği medya dosyalarını depolar.
+  media_volume:

@@ -1,0 +1,76 @@
+# development.yml
+
+# Bu dosya, Docker Compose kullanarak Django projenizin geliştirme ortamını tanımlar.
+# 'services' anahtarı altında, uygulamanızı oluşturan her bir servisi (konteyneri) tanımlarız.
+services:
+  # 'web' servisi, Django uygulamanızı çalıştıracak olan konteynerdir.
+  web:
+    # 'build: .' komutu, Docker'a bu servisin imajını mevcut dizindeki (yani 'development.yml' dosyasının bulunduğu
+    # proje kök dizini) Dockerfile'ı kullanarak oluşturmasını söyler.
+    build: .
+
+    # 'command' komutu, 'web' konteyneri başlatıldığında çalıştırılacak varsayılan komuttur.
+    # Burada Django'nun geliştirme sunucusunu (runserver) tüm arayüzlerde (0.0.0.0) ve 8000 portunda başlatır.
+    # 'manage.py' dosyanız 'backend' klasörü içinde olduğu için, Dockerfile'daki WORKDIR ayarı
+    # sayesinde 'python manage.py runserver' doğrudan çalışır.
+    command: python manage.py runserver 0.0.0.0:8000 --settings=project.settings.development
+
+    # 'volumes' anahtarı, yerel dosya sisteminizdeki dizinleri (host) konteyner içindeki dizinlere bağlamanızı sağlar.
+    # '- .:/code' ifadesi:
+    #   - '.' (nokta): Yerel dosya sisteminizdeki proje kök dizinini (development.yml'nin bulunduğu yer).
+    #   - '/code': Konteyner içindeki hedef dizin.
+    # Bu sayede, yerel kodunuzda yaptığınız değişiklikler anında konteyner içinde de görünür olur,
+    # bu da geliştirme sırasında çok kullanışlıdır çünkü her değişiklikte imajı yeniden oluşturmanıza gerek kalmaz.
+    volumes:
+      - .:/code
+
+    # 'ports' anahtarı, host makinenizin portlarını konteynerin portlarına eşler.
+    # '- "8000:8000"' ifadesi:
+    #   - İlk "8000": Host makinenizdeki erişilebilir port (tarayıcınızdan bu porta bağlanacaksınız).
+    #   - İkinci "8000": Konteynerin içindeki Django sunucusunun dinlediği port.
+    # Böylece, http://localhost:8000 adresinden Django uygulamanıza erişebilirsiniz.
+    ports:
+      - "8000:8000"
+
+    # 'env_file' anahtarı, ortam değişkenlerini bir dosyadan yüklemenizi sağlar.
+    # Django projenizdeki gizli anahtarlar, veritabanı bilgileri gibi hassas verileri bu dosyalarda tutmak iyi bir pratiktir.
+    # '- .env': Docker Compose'a, 'development.yml' ile aynı dizinde bulunan '.env' adlı dosyayı
+    #           ortam değişkenleri için kullanmasını söyler.
+    #           Projenizin kök dizininde olduğu için 'backend/' ön eki KULLANILMAMALIDIR.
+    env_file:
+      - .env
+
+    # 'depends_on' anahtarı, servisler arasındaki bağımlılıkları belirtir.
+    # 'web' servisinin 'db' servisine bağımlı olduğunu söyler. Bu, Docker Compose'un 'web' servisini
+    # başlatmadan önce 'db' servisinin başlatıldığından emin olmaya çalışacağı anlamına gelir.
+    # Ancak, bu sadece başlatma sırasını garantiler, veritabanının tam olarak "hazır" olmasını garantilemez.
+    depends_on:
+      - db
+
+  # 'db' servisi, PostgreSQL veritabanını çalıştıracak olan konteynerdir.
+  db:
+    # 'image: postgres:latest': Docker Hub'dan 'postgres' imajının en son sürümünü kullanmasını söyler.
+    # Geliştirmede 'latest' kullanmak pratik olabilir, ancak üretimde belirli bir sürümü (örn: postgres:16) kullanmak daha güvenlidir.
+    image: postgres:16 
+    # 'volumes' anahtarı, veritabanı verilerini kalıcı hale getirmek için kullanılır.
+    # '- postgres_data:/var/lib/postgresql/data/':
+    #   - 'postgres_data': Docker tarafından yönetilen, verileri kalıcı olarak depolayan isimlendirilmiş bir volume'dür.
+    #   - '/var/lib/postgresql/data/': PostgreSQL'in konteyner içinde verilerini depoladığı standart yoldur.
+    # Bu sayede, 'db' konteyneri silinse bile veritabanı verileriniz kaybolmaz.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+    # 'environment' anahtarı, konteyner için ortam değişkenlerini doğrudan belirlemenizi sağlar.
+    # Burada PostgreSQL'in varsayılan veritabanı adını, kullanıcı adını ve parolasını ayarlıyoruz.
+    # Bu değerler, yukarıda tanımlanan 'env_file: - .env' sayesinde '.env' dosyasından alınır.
+    environment:
+      - POSTGRES_DB=${DB_NAME}      # '.env' dosyasındaki DB_NAME değişkeninin değeri
+      - POSTGRES_USER=${DB_USER}    # '.env' dosyasındaki DB_USER değişkeninin değeri
+      - POSTGRES_PASSWORD=${DB_PASSWORD} # '.env' dosyasındaki DB_PASSWORD değişkeninin değeri
+
+# 'volumes' anahtarı (services seviyesinin dışında), Docker tarafından yönetilen isimlendirilmiş volume'leri tanımlar.
+# Bu volume'ler, konteynerler silinse bile verileri tutar ve farklı konteynerler arasında paylaşılabilir.
+volumes:
+  # 'postgres_data' isminde bir volume tanımlanır.
+  # Bu volume, 'db' servisinin verilerini kalıcı olarak depolamak için kullanılır.
+  postgres_data:
