@@ -24,28 +24,29 @@ Hem geliştirme hem de üretim ortamları için yapılandırılmıştır.
 ### Adımlar
 1. Projeyi klonlayın:
    ```bash
-   git clone https://github.com/kullaniciadi/projeadi.git
+   git clone https://github.com/halilarslan14/docker-django-app.git
    cd projeadi
 2. Ortam değişkenlerini .env dosyasına ekleyin (örnek .env.example dosyası olabilir).
 
 3. Geliştirme ortamını çalıştırmak için:
-bash
+   ```bash
 docker-compose -f development.yml up --build
 
 4. Üretim ortamını çalıştırmak için:
-bash
+   ```bash
 docker-compose -f production.yml up --build
 
 -- Kullanım
 Django komutlarını çalıştırmak için:
-bash
+   ```bash
 docker-compose exec backend python manage.py <komut>
 Örnek:
-
-bash Development ortmanıda admin kullanıcı oluşturma:
+Development ortmanıda admin kullanıcı oluşturma:
+   ```bash
 docker compose -f development.yml exec web python manage.py migrate --settings=project.settings.development
 
-bash Production ortmanıda admin kullanıcı oluşturma:  
+Production ortmanıda admin kullanıcı oluşturma:  
+   ```bash
 docker compose -f production.yml exec web python manage.py createsuperuser --settings=project.settings.production
 
 -- Katkıda Bulunma
