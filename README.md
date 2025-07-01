@@ -1,32 +1,34 @@
 
 # Proje Adı
 
-## Adımlar
+## Kurulum ve Çalıştırma Adımları
 
-### Projeyi klonlayın:
+### 1. Projeyi Klonlayın
 
 ```bash
 git clone https://github.com/halilarslan14/docker-django-app.git
 cd docker-django-app
 ```
 
-### Ortam değişkenlerini ekleyin
+### 2. Ortam Değişkenlerini Ayarlayın
 
-Ortam değişkenlerini `.env` dosyasına ekleyin (örnek olarak `.env.example` dosyasını kullanabilirsiniz).
+Ortam değişkenlerini `.env` dosyasına ekleyin. Örnek olarak `.env.example` dosyasını kullanabilirsiniz.
 
-### Geliştirme ortamını çalıştırmak için:
+### 3. Geliştirme Ortamını Başlatın
 
 ```bash
 docker-compose -f development.yml up --build
 ```
 
-### Üretim ortamını çalıştırmak için:
+### 4. Üretim Ortamını Başlatın
 
 ```bash
 docker-compose -f production.yml up --build
 ```
 
-### Django komutlarını çalıştırmak için:
+### 5. Django Komutlarını Çalıştırma
+
+Django yönetim komutlarını aşağıdaki şekilde çalıştırabilirsiniz:
 
 ```bash
 docker-compose exec backend python manage.py <komut>
@@ -34,25 +36,25 @@ docker-compose exec backend python manage.py <komut>
 
 #### Örnekler:
 
-Geliştirme ortamında migration çalıştırma:
+- Geliştirme ortamında veritabanı migration'larını çalıştırmak için:
 
 ```bash
 docker-compose -f development.yml exec web python manage.py migrate --settings=project.settings.development
 ```
 
-Geliştirme ortamında collectstatic çalıştırma:
+- Geliştirme ortamında statik dosyaları toplamak için:
 
 ```bash
 docker-compose -f development.yml exec web python manage.py collectstatic --noinput --settings=project.settings.development
 ```
 
-Üretim ortamında superuser oluşturma:
+- Üretim ortamında süper kullanıcı oluşturmak için:
 
 ```bash
 docker-compose -f production.yml exec web python manage.py createsuperuser --settings=project.settings.production
 ```
 
-Üretim ortamında collectstatic çalıştırma:
+- Üretim ortamında statik dosyaları toplamak için:
 
 ```bash
 docker-compose -f production.yml exec web python manage.py collectstatic --noinput --settings=project.settings.production
@@ -62,8 +64,8 @@ docker-compose -f production.yml exec web python manage.py collectstatic --noinp
 
 ## Katkıda Bulunma
 
-Pull request’ler ve öneriler memnuniyetle karşılanır.
+Katkılarınız, pull request’ler ve önerileriniz bizim için değerlidir.
 
 ## Lisans
 
-MIT Lisansı
+Bu proje MIT Lisansı ile lisanslanmıştır.
