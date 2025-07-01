@@ -15,8 +15,7 @@ __pycache__/
 
 # Ortam değişkeni dosyalarını yok say (çok önemli!)
 .env
-.env.production
-.env.env # Eğer varsa farklı ortamlar için .env.dev, .env.test gibi
+backend/staticfiles/
 
 # Veritabanı dosyaları (PostgreSQL kullanıyorsanız genellikle yerel sqlite3 olmaz ama yine de eklenebilir)
 db.sqlite3
