@@ -1,56 +1,57 @@
-# docker-django-app
-Internship Project
 
-# Django Docker Projesi
+# Proje Adı
 
-## Proje Hakkında
-Bu proje, Django tabanlı bir web uygulamasını Docker ile konteynerize etmek amacıyla hazırlanmıştır.  
-Hem geliştirme hem de üretim ortamları için yapılandırılmıştır.
+## Adımlar
 
-## Özellikler
-- Django backend  
-- Docker ile kolay kurulum ve dağıtım  
-- Ortam değişkenleri ile hassas bilgilerin yönetimi  
-- Geliştirme ve üretim için ayrı YAML konfigürasyon dosyaları  
-- Statik dosyaların yönetimi için yapılandırma  
+### Projeyi klonlayın:
 
-## Kurulum ve Çalıştırma
+```bash
+git clone https://github.com/halilarslan14/docker-django-app.git
+cd projeadi
+```
 
-### Gereksinimler
-- Docker  
-- Docker Compose  
-- Git
+### Ortam değişkenlerini ekleyin
 
-### Adımlar
-1. Projeyi klonlayın:
-   ```bash
-   git clone https://github.com/halilarslan14/docker-django-app.git
-   cd projeadi
-2. Ortam değişkenlerini .env dosyasına ekleyin (örnek .env.example dosyası olabilir).
+Ortam değişkenlerini `.env` dosyasına ekleyin (örnek olarak `.env.example` dosyasını kullanabilirsiniz).
 
-3. Geliştirme ortamını çalıştırmak için:
-   ```bash
+### Geliştirme ortamını çalıştırmak için:
+
+```bash
 docker-compose -f development.yml up --build
+```
 
-4. Üretim ortamını çalıştırmak için:
-   ```bash
+### Üretim ortamını çalıştırmak için:
+
+```bash
 docker-compose -f production.yml up --build
+```
 
--- Kullanım
-Django komutlarını çalıştırmak için:
-   ```bash
+### Django komutlarını çalıştırmak için:
+
+```bash
 docker-compose exec backend python manage.py <komut>
-Örnek:
-Development ortmanıda admin kullanıcı oluşturma:
-   ```bash
-docker compose -f development.yml exec web python manage.py migrate --settings=project.settings.development
+```
 
-Production ortmanıda admin kullanıcı oluşturma:  
-   ```bash
-docker compose -f production.yml exec web python manage.py createsuperuser --settings=project.settings.production
+#### Örnekler:
 
--- Katkıda Bulunma
+Geliştirme ortamında migration çalıştırma:
+
+```bash
+docker-compose -f development.yml exec web python manage.py migrate --settings=project.settings.development
+```
+
+Üretim ortamında superuser oluşturma:
+
+```bash
+docker-compose -f production.yml exec web python manage.py createsuperuser --settings=project.settings.production
+```
+
+---
+
+## Katkıda Bulunma
+
 Pull request’ler ve öneriler memnuniyetle karşılanır.
 
-Lisans
+## Lisans
+
 MIT Lisansı
